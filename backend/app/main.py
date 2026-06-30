@@ -1,4 +1,9 @@
 from fastapi import FastAPI
+from app.routers import api_router
+
+app = FastAPI(title="SoilTester AI")
+
+app.include_router(api_router)
 
 app = FastAPI(
     title="SoilTester AI API",
