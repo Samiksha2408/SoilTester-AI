@@ -8,6 +8,7 @@ from app.schemas.fertilizer_recommendation import (
     FertilizerRecommendationCreate,
     FertilizerRecommendationUpdate,
 )
+from ml_models.fertilizer_recommendation import fertilizer_predictor
 
 
 class FertilizerRecommendationService:
@@ -106,6 +107,18 @@ class FertilizerRecommendationService:
         FertilizerRecommendationRepository.delete(
             db,
             recommendation_id,
+        )
+        from ml_models.fertilizer_recommendation import fertilizer_predictor
+
+        result = fertilizer_predictor.predict(
+           temperature=30,
+           humidity=60,
+           moisture=45,
+           soil_type=2,
+           crop_type=5,
+           nitrogen=90,
+           potassium=40,
+           phosphorus=35,
         )
 
         return {

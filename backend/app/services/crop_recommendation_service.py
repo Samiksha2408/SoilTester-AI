@@ -8,6 +8,7 @@ from app.schemas.crop_recommendation import (
     CropRecommendationCreate,
     CropRecommendationUpdate,
 )
+from ml_models.crop_recommendation.predictor import crop_predictor
 
 
 class CropRecommendationService:
@@ -107,6 +108,21 @@ class CropRecommendationService:
             db,
             recommendation_id,
         )
+        @staticmethod
+        def predict_crop(data):
+         """
+        Predict the most suitable crop using the ML model.
+        """
+
+         return crop_predictor.predict(
+         nitrogen=data.nitrogen,
+         phosphorus=data.phosphorus,
+         potassium=data.potassium,
+         temperature=data.temperature,
+         humidity=data.humidity,
+         ph=data.ph,
+         rainfall=data.rainfall,
+         )
 
         return {
             "message": "Crop recommendation deleted successfully"

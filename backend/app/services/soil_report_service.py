@@ -6,6 +6,8 @@ from app.schemas.soil_report import (
     SoilReportCreate,
     SoilReportUpdate,
 )
+from ml_models.soil_analysis import soil_analysis_predictor
+
 
 
 class SoilReportService:
@@ -94,6 +96,14 @@ class SoilReportService:
         SoilReportRepository.delete(
             db,
             report_id,
+        )
+        result = soil_analysis_predictor.predict(
+          nitrogen=90,
+          phosphorus=42,
+          potassium=43,
+          ph=6.5,
+          moisture=35,
+          temperature=28,
         )
 
         return {
