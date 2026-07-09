@@ -4,10 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.auth import LoginRequest, Token
-from app.services.auth_service import (
-    register_user,
-    authenticate_user,
-)
+from app.services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -24,7 +21,7 @@ def register(
     user: UserCreate,
     db: Session = Depends(get_db),
 ):
-    return register_user(db, user)
+    return AuthService.register(db, user)
 
 
 # -----------------------------
@@ -38,7 +35,7 @@ def login(
     credentials: LoginRequest,
     db: Session = Depends(get_db),
 ):
-    token = authenticate_user(db, credentials)
+    token = AuthService.login(db, credentials)
 
     if token is None:
         raise HTTPException(

@@ -53,12 +53,9 @@ def get_current_user(
     return user
 
 
+from app.model.user import User
+
 def get_current_active_user(
-    current_user=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
-    """
-    Return the authenticated user.
-    Add extra checks here if you later implement
-    account activation or user status.
-    """
     return current_user

@@ -8,9 +8,17 @@ from app.schemas.user import (
     UserUpdate,
     UserResponse,
 )
+from app.auth.oauth2 import get_current_active_user
+from app.model.user import User
+
 
 router = APIRouter()
 
+@router.get("/me")
+def get_profile(
+    current_user: User = Depends(get_current_active_user),
+):
+    return current_user
 
 # --------------------------------
 # Get All Users

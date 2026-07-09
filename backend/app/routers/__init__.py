@@ -1,60 +1,84 @@
 from fastapi import APIRouter
 
-from app.routers import (
-    auth,
-    users,
-    crop_recommendations,
-    fertilizer_recommendations,
-    weather,
-    plant_diseases,
-    irrigation,
-    government_schemes,
-    satellite_monitoring,
-    chatbot,
-)
-from backend.app.routers import soil_report
+from app.routers.auth import router as auth_router 
+from app.routers.user import router as user_router
+from app.routers.soil_report import router as soil_report_router
+from app.routers.crop_recommendation import router as crop_router
+from app.routers.fertilizer_recommendation import router as fertilizer_router
+from app.routers.weather import router as weather_router
+from app.routers.plant_disease import router as plant_disease_router
+from app.routers.irrigation import router as irrigation_router
+from app.routers.government_scheme import router as government_router
+from app.routers.satellite_monitoring import router as satellite_router
+from app.routers.chatbot_history import router as chatbot_router
 
 api_router = APIRouter()
 
-# ---------------------------
-# Auth & Users
-# ---------------------------
-api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
-api_router.include_router(users.router, prefix="/users", tags=["Users"])
+# Authentication
+api_router.include_router(auth_router, prefix="/auth", tags=["Auth"])
 
-# ---------------------------
-# Core AI Modules
-# ---------------------------
-api_router.include_router(soil_report.router, prefix="/soil-reports", tags=["Soil Reports"])
-api_router.include_router(crop_recommendations.router, prefix="/crop-recommendations", tags=["Crop Recommendations"])
-api_router.include_router(fertilizer_recommendations.router, prefix="/fertilizer-recommendations", tags=["Fertilizer Recommendations"])
+# Users
+api_router.include_router(user_router, prefix="/users", tags=["Users"])
 
-# ---------------------------
-# Weather & Environment
-# ---------------------------
-api_router.include_router(weather.router, prefix="/weather", tags=["Weather"])
+# Soil Reports
+api_router.include_router(
+    soil_report_router,
+    prefix="/soil-reports",
+    tags=["Soil Reports"],
+)
 
-# ---------------------------
-# Plant Intelligence
-# ---------------------------
-api_router.include_router(plant_diseases.router, prefix="/plant-diseases", tags=["Plant Diseases"])
+# Crop Recommendation
+api_router.include_router(
+    crop_router,
+    prefix="/crop-recommendation",
+    tags=["Crop Recommendation"],
+)
 
-# ---------------------------
-# Irrigation System
-# ---------------------------
-api_router.include_router(irrigation.router, prefix="/irrigation", tags=["Irrigation"])
+# Fertilizer Recommendation
+api_router.include_router(
+    fertilizer_router,
+    prefix="/fertilizer-recommendation",
+    tags=["Fertilizer Recommendation"],
+)
 
-# ---------------------------
-# Government & Advisory
-# ---------------------------
-api_router.include_router(government_schemes.router, prefix="/government-schemes", tags=["Government Schemes"])
+# Weather
+api_router.include_router(
+    weather_router,
+    prefix="/weather",
+    tags=["Weather"],
+)
 
-# ---------------------------
-# Satellite AI Monitoring
-# ---------------------------
-api_router.include_router(satellite_monitoring.router, prefix="/satellite-monitoring", tags=["Satellite Monitoring"])
+# Plant Disease
+api_router.include_router(
+    plant_disease_router,
+    prefix="/plant-disease",
+    tags=["Plant Disease"],
+)
 
-# ---------------------------
-# AI Chatbot
-# ---------------------------
-api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
+# Irrigation
+api_router.include_router(
+    irrigation_router,
+    prefix="/irrigation",
+    tags=["Irrigation"],
+)
+
+# Government Scheme
+api_router.include_router(
+    government_router,
+    prefix="/government-scheme",
+    tags=["Government Scheme"],
+)
+
+# Satellite Monitoring
+api_router.include_router(
+    satellite_router,
+    prefix="/satellite-monitoring",
+    tags=["Satellite Monitoring"],
+)
+
+# Chatbot
+api_router.include_router(
+    chatbot_router,
+    prefix="/chatbot",
+    tags=["Chatbot"],
+)

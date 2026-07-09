@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
+from app.auth.hashing import Hash
 
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate
@@ -29,13 +30,16 @@ class AuthService:
         # Hash the password after implementing auth/hashing.py
         # user.password = Hash.hash_password(user.password)
 
+        # Hash password before saving
+        user.password = Hash.hash_password(user.password)
+
         created_user = UserRepository.create(
-            db,
-            user,
+         db,
+         user,
         )
 
-        return created_user
-
+        return created_user  
+    
     @staticmethod
     def login(
         db: Session,
@@ -61,12 +65,14 @@ class AuthService:
         # ):
         #     raise HTTPException(...)
 
-        if login_data.password != user.hashed_password:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password",
-            )
-
+        if not Hash.verify_password(
+    login_data.password,
+    user.hashed_password,
+     ):
+          raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Invalid email or password",
+    )
         # TODO:
         # Replace with JWT generation
         # token = create_access_token(
