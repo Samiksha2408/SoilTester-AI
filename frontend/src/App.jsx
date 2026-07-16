@@ -1,3 +1,5 @@
+import { Routes, Route } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
@@ -6,7 +8,10 @@ import WhyChoose from "./components/WhyChoose";
 import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
 
-function App() {
+import Login from "./pages/Login";
+
+// Landing Page Component
+function Home() {
   return (
     <>
       <Navbar />
@@ -17,6 +22,15 @@ function App() {
       <Testimonials />
       <Footer />
     </>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
   );
 }
 
