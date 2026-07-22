@@ -1,8 +1,10 @@
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-green-50 flex items-center justify-center px-6">
       <div className="bg-white w-full max-w-md rounded-3xl shadow-xl p-10">
@@ -18,7 +20,15 @@ function Login() {
         </div>
 
         {/* Form */}
-        <form className="mt-10">
+        <form
+          className="mt-10"
+          onSubmit={(e) => {
+            e.preventDefault();
+            console.log("Email:", email);
+            console.log("Password:", password);
+            navigate("/dashboard");
+          }}
+        >
           <div className="mb-5">
             <label className="block text-gray-700 font-medium mb-2">
               Email
@@ -54,10 +64,11 @@ function Login() {
           </div>
 
           <button
-            type="button"
+            type="submit"
             onClick={() => {
               console.log("Email:", email);
               console.log("Password:", password);
+              navigate("/dashboard");
             }}
             className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-semibold transition"
           >

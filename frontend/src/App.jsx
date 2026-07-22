@@ -7,6 +7,7 @@ import HowItWorks from "./components/HowItWorks";
 import WhyChoose from "./components/WhyChoose";
 import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
+import Dashboard from "./pages/Dashboard";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -32,6 +33,7 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
   );
 }
