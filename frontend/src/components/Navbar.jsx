@@ -17,9 +17,12 @@ function Navbar() {
           Login
         </Link>
 
-        <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl">
+        <Link
+          to="/register"
+          className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl"
+        >
           Register
-        </button>
+        </Link>
       </div>
     </nav>
   );

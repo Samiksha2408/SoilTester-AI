@@ -9,6 +9,7 @@ import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
 
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 // Landing Page Component
 function Home() {
@@ -30,6 +31,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
     </Routes>
   );
 }
