@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import {
   LayoutDashboard,
   FileText,
@@ -18,15 +19,21 @@ function Sidebar() {
           Dashboard
         </div>
 
-        <div className="flex items-center gap-3 cursor-pointer hover:text-green-200">
+        <Link
+          to="/soil-analysis"
+          className="flex items-center gap-3 hover:text-green-200"
+        >
           <FileText size={22} />
           Soil Analysis
-        </div>
+        </Link>
 
-        <div className="flex items-center gap-3 cursor-pointer hover:text-green-200">
+        <Link
+          to="/crop-recommendation"
+          className="flex items-center gap-3 hover:text-green-200"
+        >
           <Sprout size={22} />
           Crop Recommendation
-        </div>
+        </Link>
 
         <div className="flex items-center gap-3 cursor-pointer hover:text-green-200">
           <CloudSun size={22} />

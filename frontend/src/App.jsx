@@ -1,5 +1,6 @@
+import CropRecommendation from "./pages/CropRecommendation";
+import SoilAnalysis from "./pages/SoilAnalysis";
 import { Routes, Route } from "react-router-dom";
-
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
@@ -34,6 +35,8 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/soil-analysis" element={<SoilAnalysis />} />
+      <Route path="/crop-recommendation" element={<CropRecommendation />} />
     </Routes>
   );
 }

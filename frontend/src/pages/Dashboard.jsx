@@ -1,3 +1,4 @@
+import RecentReports from "../components/dashboard/RecentReports";
 import Sidebar from "../components/dashboard/Sidebar";
 import Topbar from "../components/dashboard/Topbar";
 import StatsCard from "../components/dashboard/StatsCard";
@@ -28,6 +29,8 @@ function Dashboard() {
               color="text-purple-600"
             />
           </div>
+
+          <RecentReports />
         </div>
       </div>
     </div>

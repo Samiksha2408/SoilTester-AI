@@ -1,7 +1,13 @@
 function Topbar() {
   return (
     <div className="bg-white shadow px-8 py-5 flex justify-between items-center">
-      <h2 className="text-3xl font-bold">Dashboard</h2>
+      <div>
+        <h2 className="text-3xl font-bold">Dashboard</h2>
+
+        <p className="text-gray-500 mt-1">
+          Monitor your soil health, crop recommendations and reports.
+        </p>
+      </div>
 
       <div className="flex items-center gap-4">
         <img
