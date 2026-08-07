@@ -1,6 +1,7 @@
 import CropRecommendation from "./pages/CropRecommendation";
 import SoilAnalysis from "./pages/SoilAnalysis";
 import { Routes, Route } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
@@ -8,10 +9,14 @@ import HowItWorks from "./components/HowItWorks";
 import WhyChoose from "./components/WhyChoose";
 import Testimonials from "./components/Testimonials";
 import Footer from "./components/Footer";
-import Dashboard from "./pages/Dashboard";
 
+import Dashboard from "./pages/Dashboard";
+import Weather from "./pages/Weather";
+import SoilHealth from "./pages/SoilHealth";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+import DashboardLayout from "./components/dashboard/DashboardLayout";
 
 // Landing Page Component
 function Home() {
@@ -31,12 +36,19 @@ function Home() {
 function App() {
   return (
     <Routes>
+      {/* Public pages */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/soil-analysis" element={<SoilAnalysis />} />
-      <Route path="/crop-recommendation" element={<CropRecommendation />} />
+
+      {/* SmartAgriAI application pages */}
+      <Route element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/soil-analysis" element={<SoilAnalysis />} />
+        <Route path="/crop-recommendation" element={<CropRecommendation />} />
+        <Route path="/weather" element={<Weather />} />
+        <Route path="/soil-health" element={<SoilHealth />} />
+      </Route>
     </Routes>
   );
 }
