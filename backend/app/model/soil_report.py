@@ -12,9 +12,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-
 class SoilReport(Base):
     __tablename__ = "soil_reports"
+
 
     # Primary Key
     id: Mapped[int] = mapped_column(
@@ -25,6 +25,7 @@ class SoilReport(Base):
 
     # User Relationship
     user_id: Mapped[int] = mapped_column(
+        Integer,
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False
     )
@@ -37,7 +38,7 @@ class SoilReport(Base):
 
     report_file: Mapped[str] = mapped_column(
         String(255),
-        nullable=False
+        nullable=True
     )
 
     ocr_text: Mapped[str | None] = mapped_column(
@@ -115,6 +116,7 @@ class SoilReport(Base):
         back_populates="soil_reports"
     )
 
+   
     crop_recommendations = relationship(
         "CropRecommendation",
         back_populates="soil_report",

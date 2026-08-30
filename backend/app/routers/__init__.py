@@ -22,11 +22,9 @@ api_router.include_router(user_router, prefix="/users", tags=["Users"])
 
 # Soil Reports
 api_router.include_router(
-    soil_report_router,
-    prefix="/soil-reports",
-    tags=["Soil Reports"],
-)
-
+   soil_report_router
+    )
+    
 # Crop Recommendation
 api_router.include_router(
     crop_router,

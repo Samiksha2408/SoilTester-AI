@@ -32,7 +32,7 @@ class UserRepository:
         db_user = User(
             full_name=user.full_name,
             email=user.email,
-            hashed_password=user.password,   # Replace with hashed password later
+            password=user.password,  
             phone=user.phone,
             role=user.role,
             address=user.address,
@@ -56,6 +56,18 @@ class UserRepository:
             .filter(User.id == user_id)
             .first()
         )
+        if user_data.full_name is not None:
+            user.full_name = user_data.full_name
+
+        if user_data.phone is not None:
+            user.phone = user_data.phone
+
+        if user_data.address is not None:
+            user.address = user_data.address
+
+        if user_data.profile_image is not None:
+            user.profile_image = user_data.profile_image
+
 
         if not db_user:
             return None

@@ -1,6 +1,22 @@
 from fastapi import FastAPI
 
 from app.routers import api_router
+from app.database import Base, engine
+
+# Import all models
+from app.model.user import User
+from app.model.soil_report import SoilReport
+from app.model.crop_recommendation import CropRecommendation
+from app.model.fertilizer_recommendation import FertilizerRecommendation
+from app.model.weather import Weather
+from app.model.plant_disease import PlantDisease
+from app.model.irrigation import Irrigation
+from app.model.government_scheme import GovernmentScheme
+from app.model.satellite_monitoring import SatelliteMonitoring
+from app.model.chatbot_history import ChatbotHistory
+# Import any other models you have
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="SoilTester AI API",

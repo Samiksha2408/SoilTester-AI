@@ -1,7 +1,7 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 from app.auth.hashing import Hash
-
+from app.auth.jwt import create_access_token
 from app.repositories.user_repository import UserRepository
 from app.schemas.user import UserCreate
 from app.schemas.auth import LoginRequest
@@ -26,7 +26,7 @@ class AuthService:
                 detail="Email already exists",
             )
 
-        # TODO:
+        
         # Hash the password after implementing auth/hashing.py
         # user.password = Hash.hash_password(user.password)
 
@@ -57,7 +57,7 @@ class AuthService:
                 detail="Invalid email or password",
             )
 
-        # TODO:
+        
         # Replace with password verification
         # if not Hash.verify_password(
         #     login_data.password,
@@ -67,22 +67,24 @@ class AuthService:
 
         if not Hash.verify_password(
     login_data.password,
-    user.hashed_password,
+    user.password,
      ):
           raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid email or password",
     )
-        # TODO:
+        
         # Replace with JWT generation
         # token = create_access_token(
         #     data={"sub": user.email}
         # )
 
-        token = "your_jwt_access_token"
+        access_token = create_access_token(
+        data={"sub": user.email}
+    )
 
         return {
-            "access_token": token,
+            "access_token": access_token,
             "token_type": "bearer",
             "user": user,
         }
@@ -104,4 +106,15 @@ class AuthService:
                 detail="User not found",
             )
 
+        return user
+    
+    @staticmethod 
+    def authenticate(db: Session, email: str, password: str): 
+        user = ( 
+            db.query(User) .filter(User.email == email) .first() 
+        ) 
+        if not user: 
+            return None
+        if not Hash.verify_password(password, user.password): 
+                return None 
         return user

@@ -1,4 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status,UploadFile, File
+import os
+import shutil
+import tempfile
+from app.ml_models.plant_disease.predictor import plant_disease_predictor
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -46,6 +50,63 @@ def get_plant_diseases(
     return db.query(PlantDisease).all()
 
 
+@router.post("/predict")
+async def predict_plant_disease(
+    image: UploadFile = File(...)
+):
+    # Check file type
+    allowed_types = {
+        "image/jpeg",
+        "image/png",
+        "image/jpg",
+    }
+
+    if image.content_type not in allowed_types:
+        raise HTTPException(
+            status_code=400,
+            detail="Only JPG and PNG images are allowed"
+        )
+
+    # Create temporary file
+    suffix = os.path.splitext(image.filename or "")[1]
+
+    with tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=suffix
+    ) as temp_file:
+
+        shutil.copyfileobj(
+            image.file,
+            temp_file
+        )
+
+        temp_path = temp_file.name
+
+    try:
+        # Run ML prediction
+        result = plant_disease_predictor.predict(
+            temp_path
+        )
+
+        return {
+            "success": True,
+            "filename": image.filename,
+            "disease": result["disease"],
+            "confidence": result["confidence"],
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Prediction failed: {str(e)}"
+        )
+
+    finally:
+        # Delete temporary image
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+
+            
 # --------------------------------
 # Get Plant Disease By ID
 # --------------------------------

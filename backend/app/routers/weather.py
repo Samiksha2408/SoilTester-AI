@@ -1,5 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+
+from app.ml_models.weather_prediction.predictor import weather_predictor
 
 from app.database import get_db
 from app.model.weather import Weather
@@ -45,6 +48,44 @@ def get_weather_records(
 ):
     return db.query(Weather).all()
 
+# --------------------------------
+# Weather Prediction Request
+# --------------------------------
+class WeatherPredictionRequest(BaseModel):
+    temperature: float
+    humidity: float
+    wind_bearing: float
+    visibility: float
+    wind_speed: float
+    pressure: float
+
+
+# --------------------------------
+# AI Weather Prediction
+# --------------------------------
+@router.post("/predict")
+def predict_weather(
+    data: WeatherPredictionRequest,
+):
+    try:
+        prediction = weather_predictor.predict(
+            temperature=data.temperature,
+            humidity=data.humidity,
+            wind_bearing=data.wind_bearing,
+            visibility=data.visibility,
+            wind_speed=data.wind_speed,
+            pressure=data.pressure,
+        )
+
+        return {
+            "prediction": prediction
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Weather prediction failed: {str(e)}",
+        )
 
 # --------------------------------
 # Get Weather Record By ID

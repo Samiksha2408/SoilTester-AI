@@ -1,7 +1,6 @@
 import os
-
 import joblib
-import numpy as np
+import pandas as pd 
 
 
 class CropPredictor:
@@ -31,18 +30,15 @@ class CropPredictor:
         Predict the most suitable crop.
         """
 
-        features = np.array([
-            [
-                nitrogen,
-                phosphorus,
-                potassium,
-                temperature,
-                humidity,
-                ph,
-                rainfall,
-            ]
-        ])
-
+        features = pd.DataFrame([{
+             "N": nitrogen,
+             "P": phosphorus,
+             "K": potassium,
+             "temperature": temperature,
+             "humidity": humidity,
+             "ph": ph,
+            "rainfall": rainfall,
+        }])
         prediction = self.model.predict(features)
 
         return prediction[0]

@@ -1,29 +1,27 @@
-import numpy as np
+import pandas as pd
 
 
 class WeatherPreprocessor:
-    """
-    Preprocessing utilities for weather prediction.
-    """
 
     @staticmethod
     def prepare_input(
         temperature: float,
         humidity: float,
-        rainfall: float,
+        wind_bearing: float,
+        visibility: float,
         wind_speed: float,
         pressure: float,
-    ) -> np.ndarray:
-        """
-        Prepare input data for the weather prediction model.
-        """
+    ):
 
-        return np.array([
-            [
-                temperature,
-                humidity,
-                rainfall,
-                wind_speed,
-                pressure,
-            ]
+        data = pd.DataFrame([
+            {
+                "Temperature (C)": temperature,
+                "Humidity": humidity,
+                "Wind Speed (km/h)": wind_speed,
+                "Wind Bearing (degrees)": wind_bearing,
+                "Visibility (km)": visibility,
+                "Pressure (millibars)": pressure,
+            }
         ])
+
+        return data
