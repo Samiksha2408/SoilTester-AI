@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict
 # Base Schema
 # ---------------------------
 class SoilReportBase(BaseModel):
+    report_name:str
     soil_type: Optional[str] = None
 
     ph: Optional[float] = None

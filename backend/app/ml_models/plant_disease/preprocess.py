@@ -12,14 +12,10 @@ class PlantDiseasePreprocessor:
     @staticmethod
     def preprocess_image(image_path: str) -> np.ndarray:
         """
-        Load and preprocess an image for prediction.
+        Load and prepare an image for the trained model.
 
-        Args:
-            image_path: Path to the uploaded image.
-
-        Returns:
-            Preprocessed image as a NumPy array with shape
-            (1, 224, 224, 3).
+        The model itself contains MobileNetV2 preprocessing,
+        so this function must NOT normalize pixels to 0-1.
         """
 
         # Open image
@@ -28,21 +24,21 @@ class PlantDiseasePreprocessor:
         # Convert to RGB
         image = image.convert("RGB")
 
-        # Resize image
+        # Resize
         image = image.resize(
             PlantDiseasePreprocessor.IMAGE_SIZE
         )
 
-        # Convert image to NumPy array
-        image_array = np.array(image, dtype=np.float32)
-
-        # Normalize pixel values (0-255 -> 0-1)
-        image_array = image_array / 255.0
+        # Convert to float32
+        image_array = np.array(
+            image,
+            dtype=np.float32
+        )
 
         # Add batch dimension
         image_array = np.expand_dims(
             image_array,
-            axis=0,
+            axis=0
         )
 
         return image_array

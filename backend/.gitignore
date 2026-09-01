@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+venv/
+venv312/
+venv314/
+.venv/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# macOS / IDE
+.DS_Store
+.vscode/
+.idea/
+
+# Local database
+*.db
+soiltester.db
+
+# Training datasets
+data/
+ml_training/raw/
+ml_training/plantvillage/
+ml_training/dataset/
+ml_training/train/
+ml_training/validation/
+ml_training/test/
+
+# Temporary files
+*.log
+tmp/
+temp/
+
+# Jupyter
+.ipynb_checkpoints/
+ml_training/
+.DS_Store
+.vscode/
+
+backend/.env
+backend/venv/
+backend/venv312/
+backend/venv314/
+backend/.venv/
+
+backend/data/
+backend/ml_training/
+backend/*.db
+
+**/__pycache__/
+*.pyc

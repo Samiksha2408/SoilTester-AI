@@ -3,11 +3,14 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.model.crop_recommendation import CropRecommendation
+from app.model.soil_report import SoilReport
 from app.schemas.crop_recommendation import (
     CropRecommendationCreate,
     CropRecommendationUpdate,
     CropRecommendationResponse,
 )
+
+from app.ml_models.crop_recommendation.predictor import crop_predictor
 
 router = APIRouter()
 
@@ -24,9 +27,85 @@ def create_crop_recommendation(
     recommendation: CropRecommendationCreate,
     db: Session = Depends(get_db),
 ):
-    new_recommendation = CropRecommendation(
-        **recommendation.model_dump()
+    # -----------------------------------
+    # 1. Find the soil report
+    # -----------------------------------
+    soil_report = (
+        db.query(SoilReport)
+        .filter(
+            SoilReport.id == recommendation.soil_report_id
+        )
+        .first()
     )
+
+    if soil_report is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=(
+                f"Soil report with ID "
+                f"{recommendation.soil_report_id} not found"
+            ),
+        )
+
+    # -----------------------------------
+    # 2. Validate soil values
+    # -----------------------------------
+    if (
+        soil_report.nitrogen is None
+        or soil_report.phosphorus is None
+        or soil_report.potassium is None
+        or soil_report.ph is None
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Soil report must contain "
+                "nitrogen, phosphorus, potassium "
+                "and pH values."
+            ),
+        )
+
+    # -----------------------------------
+    # 3. Run Crop ML model
+    # -----------------------------------
+    predicted_crop = crop_predictor.predict(
+        nitrogen=soil_report.nitrogen,
+        phosphorus=soil_report.phosphorus,
+        potassium=soil_report.potassium,
+        temperature=recommendation.temperature,
+        humidity=recommendation.humidity,
+        ph=soil_report.ph,
+        rainfall=recommendation.rainfall,
+    )
+
+    # -----------------------------------
+    # 4. Create recommendation
+    # -----------------------------------
+    new_recommendation = CropRecommendation(
+        soil_report_id=soil_report.id,
+
+        crop_name=str(predicted_crop),
+
+        season=None,
+
+        confidence_score=None,
+
+        expected_yield=None,
+
+        water_requirement=None,
+
+        growth_duration_days=None,
+
+        recommendation_reason=(
+            "Crop recommended using the trained "
+            "Random Forest crop recommendation model "
+            "based on soil and weather conditions."
+        ),
+    )
+
+    # -----------------------------------
+    # 5. Save to database
+    # -----------------------------------
 
     db.add(new_recommendation)
     db.commit()

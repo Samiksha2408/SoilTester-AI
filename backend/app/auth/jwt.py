@@ -32,11 +32,20 @@ def create_access_token(
 
     to_encode.update({"exp": expire})
 
+    print("CREATING JWT")
+    print("SECRET:", SECRET_KEY)
+    print("ALGORITHM:", ALGORITHM)
+    print("DATA:", to_encode)
+
+
     encoded_jwt = jwt.encode(
         to_encode,
         SECRET_KEY,
         algorithm=ALGORITHM,
     )
+
+
+    print("TOKEN CREATED:", encoded_jwt[:30], "...")
 
     return encoded_jwt
 
@@ -50,6 +59,10 @@ def verify_access_token(
 ):
 
     try:
+        print("VERIFYING JWT")
+        print("SECRET:", SECRET_KEY)
+        print("ALGORITHM:", ALGORITHM)
+        print("TOKEN:", token[:30], "...")
 
         payload = jwt.decode(
             token,
@@ -57,12 +70,18 @@ def verify_access_token(
             algorithms=[ALGORITHM],
         )
 
-        email: str = payload.get("sub")
+        print("JWT PAYLOAD:", payload)
 
-        if email is None:
+        if payload.get("sub") is None:
+            print("JWT ERROR: sub missing")
             return None
+
 
         return payload
 
-    except JWTError:
+    except JWTError as e:
+        print("JWT ERROR:", e)
         return None
+    
+
+

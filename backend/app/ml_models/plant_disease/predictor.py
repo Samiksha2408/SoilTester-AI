@@ -17,7 +17,7 @@ class PlantDiseasePredictor:
 
         base_dir = os.path.dirname(__file__)
 
-        model_path = os.path.join(base_dir, "model.h5")
+        model_path = os.path.join(base_dir, "model.keras")
         labels_path = os.path.join(base_dir, "labels.json")
 
         self.model = load_model(model_path)
