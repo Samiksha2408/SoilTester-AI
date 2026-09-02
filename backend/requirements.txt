@@ -68,7 +68,7 @@ python-dotenv==1.2.3
 python-jose==3.5.0
 python-multipart==0.0.32
 python-slugify==8.0.4
-PyYAML==6.0.3
+PyYAML==6.0.2
 referencing==0.37.0
 reportlab==5.0.1
 requests==2.34.2
