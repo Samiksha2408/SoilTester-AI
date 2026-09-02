@@ -97,3 +97,4 @@ websockets==17.1
 wheel==0.48.0
 wrapt==2.3.0
 pandas==2.3.2
+opencv-python-headless==4.12.0.88
