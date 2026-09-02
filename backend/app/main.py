@@ -14,6 +14,7 @@ from app.model.irrigation import Irrigation
 from app.model.government_scheme import GovernmentScheme
 from app.model.satellite_monitoring import SatelliteMonitoring
 from app.model.chatbot_history import ChatbotHistory
+from app.routers.soil_ocr import router as soil_ocr_router
 # Import any other models you have
 
 Base.metadata.create_all(bind=engine)
@@ -22,6 +23,10 @@ app = FastAPI(
     title="SoilTester AI API",
     description="Backend API for SoilTester AI",
     version="1.0.0",
+)
+
+app.include_router(
+    soil_ocr_router
 )
 
 # Include all API routers
