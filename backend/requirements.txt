@@ -99,3 +99,4 @@ wrapt==2.3.0
 pandas==2.3.2
 opencv-python-headless==4.12.0.88
 paddleocr==3.7.0
+pdf2image==1.17.0
