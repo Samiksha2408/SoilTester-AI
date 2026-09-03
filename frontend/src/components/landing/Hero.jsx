@@ -1,7 +1,7 @@
-import { ArrowRight, CloudSun, Leaf, Sparkles } from "lucide-react"
-import { Link } from "react-router-dom"
-import Badge from "../ui/Badge"
-import Button from "../ui/Button"
+import { ArrowRight, CloudSun, Leaf, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import Badge from "../ui/Badge";
+import Button from "../ui/Button";
 
 function HeroVisual() {
   return (
@@ -11,8 +11,12 @@ function HeroVisual() {
       <div className="relative overflow-hidden rounded-3xl border border-stone-200 bg-white p-5 shadow-[var(--shadow-lift)] sm:p-6">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">Farm intelligence</p>
-            <p className="text-lg font-bold text-stone-900">Demo field overview</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-stone-400">
+              Farm intelligence
+            </p>
+            <p className="text-lg font-bold text-stone-900">
+              Demo field overview
+            </p>
           </div>
           <Badge>
             <Sparkles className="h-3.5 w-3.5" />
@@ -33,7 +37,9 @@ function HeroVisual() {
               <Leaf className="h-4 w-4 text-emerald-300" />
               Wheat
             </p>
-            <p className="mt-2 text-xs text-emerald-100/80">Rabi · 4.2 t/acre</p>
+            <p className="mt-2 text-xs text-emerald-100/80">
+              Rabi · 4.2 t/acre
+            </p>
           </div>
         </div>
         <div className="mt-3 rounded-2xl border border-stone-100 p-4">
@@ -52,7 +58,10 @@ function HeroVisual() {
                   <span>{row.label}</span>
                 </div>
                 <div className="h-1.5 rounded-full bg-stone-100">
-                  <div className="h-full rounded-full bg-forest-600" style={{ width: row.w }} />
+                  <div
+                    className="h-full rounded-full bg-forest-600"
+                    style={{ width: row.w }}
+                  />
                 </div>
               </div>
             ))}
@@ -63,16 +72,21 @@ function HeroVisual() {
             <CloudSun className="h-4 w-4 text-amber-500" />
             28°C · Partly cloudy
           </div>
-          <span className="text-xs font-semibold text-forest-700">Nashik demo</span>
+          <span className="text-xs font-semibold text-forest-700">
+            Nashik demo
+          </span>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function Hero() {
   return (
-    <section id="home" className="relative overflow-hidden px-4 pb-16 pt-12 sm:px-6 sm:pt-16 lg:pt-20">
+    <section
+      id="home"
+      className="relative overflow-hidden px-4 pb-16 pt-12 sm:px-6 sm:pt-16 lg:pt-20"
+    >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,_rgba(20,83,45,0.08),_transparent_60%)]" />
       <div className="relative mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div className="animate-fade-up">
@@ -81,18 +95,23 @@ export default function Hero() {
             Smarter Farming Starts With Better Decisions
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
-            SmartAgriAI helps farmers analyze soil, discover suitable crops, plan fertilizers and make
-            data-driven farming decisions using AI-powered insights.
+            SmartAgriAI helps farmers analyze soil, discover suitable crops,
+            plan fertilizers and make data-driven farming decisions using
+            AI-powered insights.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link to="/dashboard">
+            <Link to="/register">
               <Button size="lg" className="w-full sm:w-auto">
                 Get Started
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
             <a href="#features">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="secondary"
+                className="w-full sm:w-auto"
+              >
                 Explore Features
               </Button>
             </a>
@@ -103,5 +122,5 @@ export default function Hero() {
         </div>
       </div>
     </section>
-  )
+  );
 }

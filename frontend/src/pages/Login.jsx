@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 
-import { loginUser } from "../services/api";
+// import { loginUser } from "../services/api";
 import { useApp } from "../context/AppContext";
 import Logo from "../components/ui/Logo";
 
@@ -40,15 +40,12 @@ export default function Login() {
     try {
       setLoading(true);
 
-      const data = await loginUser({
-        email: form.email,
-        password: form.password,
-      });
+      // Demo login — no backend required
+      login("demo-access-token");
 
-      login(data.access_token);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError("Login failed. Please try again.");
     } finally {
       setLoading(false);
     }

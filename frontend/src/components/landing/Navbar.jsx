@@ -1,9 +1,9 @@
-import { Menu, X } from "lucide-react"
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { strings } from "../../i18n/strings"
-import Button from "../ui/Button"
-import Logo from "../ui/Logo"
+import { Menu, X } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { strings } from "../../i18n/strings";
+import Button from "../ui/Button";
+import Logo from "../ui/Logo";
 
 const links = [
   { href: "#home", label: strings.nav.home },
@@ -11,10 +11,10 @@ const links = [
   { href: "#how-it-works", label: strings.nav.how },
   { href: "#about", label: strings.nav.about },
   { href: "#contact", label: strings.nav.contact },
-]
+];
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-white/85 backdrop-blur-md">
@@ -35,7 +35,7 @@ export default function Navbar() {
           <Link to="/dashboard">
             <Button variant="ghost">{strings.nav.login}</Button>
           </Link>
-          <Link to="/dashboard">
+          <Link to="/register">
             <Button>{strings.nav.getStarted}</Button>
           </Link>
         </div>
@@ -61,17 +61,17 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
-            <Link to="/dashboard" onClick={() => setOpen(false)}>
+            <Link to="/login" onClick={() => setOpen(false)}>
               <Button variant="secondary" className="w-full">
                 {strings.nav.login}
               </Button>
             </Link>
-            <Link to="/dashboard" onClick={() => setOpen(false)}>
+            <Link to="/register" onClick={() => setOpen(false)}>
               <Button className="w-full">{strings.nav.getStarted}</Button>
             </Link>
           </div>
         </div>
       ) : null}
     </header>
-  )
+  );
 }
