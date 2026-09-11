@@ -1,7 +1,7 @@
 import {
   CloudSun,
   FileText,
-  FlaskConical,
+  // FlaskConical,
   LayoutDashboard,
   LogOut,
   MessageSquare,
@@ -17,7 +17,6 @@ import Logo from "../ui/Logo";
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/soil-analysis", label: "Soil Analysis", icon: FlaskConical },
   { to: "/crop-recommendation", label: "Crop Recommendation", icon: Wheat },
   { to: "/weather", label: "Weather", icon: CloudSun },
   { to: "/fertilizer-plan", label: "Fertilizer Plan", icon: Sprout },

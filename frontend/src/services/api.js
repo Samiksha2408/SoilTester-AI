@@ -66,6 +66,16 @@ export function logoutUser() {
     method: "POST",
   });
 }
+export function getCurrentUser() {
+  return request("/users/users/me");
+}
+
+export function updateCurrentUser(payload) {
+  return request("/users/users/me", {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
 
 // ------------------------------------
 // Soil Reports
@@ -111,10 +121,13 @@ export function analyzeSoil(payload) {
 }
 
 export function recommendCrop(payload) {
-  return request("/crop-recommendation", {
+  return request("/crop-recommendation/", {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+export function getCropRecommendations() {
+  return request("/crop-recommendation/");
 }
 
 export function getWeather(payload) {
@@ -122,7 +135,7 @@ export function getWeather(payload) {
     ? `?location=${encodeURIComponent(payload.location)}`
     : "";
 
-  return request(`/weather${query}`);
+  return request(`/weather/${query}`);
 }
 
 export function getFertilizerPlan(payload) {
@@ -131,9 +144,12 @@ export function getFertilizerPlan(payload) {
     body: JSON.stringify(payload),
   });
 }
+export function getFertilizerRecommendations() {
+  return request("/fertilizer-recommendation/");
+}
 
 export function sendAIMessage(payload) {
-  return request("/chatbot", {
+  return request("/chatbot/", {
     method: "POST",
     body: JSON.stringify(payload),
   });

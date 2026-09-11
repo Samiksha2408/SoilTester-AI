@@ -1,110 +1,166 @@
-import { Send, Sparkles } from "lucide-react"
-import { useRef, useState } from "react"
-import Button from "../components/ui/Button"
-import { aiResponses, aiSuggestedQuestions } from "../data/mockData"
-import { delay } from "../utils/delay"
+import { useState } from "react";
+import { Bot, Send, Loader2 } from "lucide-react";
 
-function replyFor(text) {
-  const q = text.toLowerCase()
-  if (q.includes("crop") || q.includes("grow")) return aiResponses.crop
-  if (q.includes("soil")) return aiResponses.soil
-  if (q.includes("fertilizer") || q.includes("fertiliser")) return aiResponses.fertilizer
-  if (q.includes("weather") || q.includes("forecast")) return aiResponses.weather
-  return aiResponses.default
-}
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import { sendAIMessage } from "../services/api";
+import { useApp } from "../context/AppContext";
 
 export default function AIAssistant() {
-  const [input, setInput] = useState("")
-  const [busy, setBusy] = useState(false)
-  const [messages, setMessages] = useState([
-    {
-      id: "welcome",
-      role: "ai",
-      text: "Hello. I am the SmartAgriAI demo assistant. Ask about crops, soil, fertilizer or weather.",
-    },
-  ])
-  const listRef = useRef(null)
+  const { profile } = useApp();
 
-  async function send(text) {
-    const content = (text || input).trim()
-    if (!content || busy) return
-    setInput("")
-    const userMsg = { id: `u-${Date.now()}`, role: "user", text: content }
-    setMessages((prev) => [...prev, userMsg])
-    setBusy(true)
-    await delay(700)
-    setMessages((prev) => [
-      ...prev,
-      { id: `a-${Date.now()}`, role: "ai", text: replyFor(content) },
-    ])
-    setBusy(false)
-    requestAnimationFrame(() => {
-      listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: "smooth" })
-    })
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [topic, setTopic] = useState("General Agriculture");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    const userMessage = message.trim();
+
+    if (!userMessage || loading || !profile?.id) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    const startTime = performance.now();
+
+    try {
+      // The current backend endpoint saves conversation history.
+      // It does not generate an AI response yet.
+      const botResponse =
+        "Your question has been recorded. AI-powered recommendations will be available when the AI generation service is connected.";
+
+      const responseTime = (performance.now() - startTime) / 1000;
+
+      const payload = {
+        user_message: userMessage,
+        bot_response: botResponse,
+        topic,
+        model_name: "SmartAgriAI",
+        response_time: responseTime,
+        user_id: Number(profile.id),
+      };
+
+      await sendAIMessage(payload);
+
+      setMessages((previous) => [
+        ...previous,
+        {
+          user: userMessage,
+          bot: botResponse,
+        },
+      ]);
+
+      setMessage("");
+    } catch (err) {
+      console.error("AI Assistant error:", err);
+      setError(err.message || "Failed to save conversation.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="flex min-h-[calc(100svh-8.5rem)] flex-col">
-      <div className="mb-4">
+    <div className="space-y-6">
+      <div>
         <h2 className="text-2xl font-bold text-stone-900">AI Assistant</h2>
-        <p className="mt-1 text-sm text-stone-500">Mock replies for now. `sendAIMessage()` is ready for the backend.</p>
+
+        <p className="mt-1 text-stone-500">
+          Ask questions related to farming, soil, crops, and fertilizers.
+        </p>
       </div>
 
-      <div className="mb-4 flex flex-wrap gap-2">
-        {aiSuggestedQuestions.map((q) => (
-          <button
-            key={q}
-            type="button"
-            onClick={() => send(q)}
-            className="rounded-full border border-stone-200 bg-white px-3 py-1.5 text-left text-xs font-medium text-stone-600 hover:border-forest-600"
-          >
-            {q}
-          </button>
-        ))}
-      </div>
-
-      <div
-        ref={listRef}
-        className="scrollbar-thin flex-1 space-y-3 overflow-y-auto rounded-2xl border border-stone-200 bg-white p-4"
-      >
-        {messages.map((m) => (
-          <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div
-              className={`max-w-[min(100%,36rem)] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                m.role === "user" ? "bg-forest-800 text-white" : "bg-mist text-stone-800"
-              }`}
-            >
-              {m.role === "ai" ? (
-                <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-forest-700">
-                  <Sparkles className="h-3 w-3" />
-                  Assistant
-                </p>
-              ) : null}
-              {m.text}
-            </div>
+      <Card>
+        <div className="mb-5 flex items-center gap-3">
+          <div className="rounded-xl bg-emerald-100 p-3">
+            <Bot className="h-6 w-6 text-forest-700" />
           </div>
-        ))}
-        {busy ? <p className="text-xs text-stone-400">Thinking…</p> : null}
-      </div>
 
-      <form
-        className="mt-4 flex gap-2"
-        onSubmit={(e) => {
-          e.preventDefault()
-          send()
-        }}
-      >
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask a farming question"
-          className="min-w-0 flex-1 rounded-xl border border-stone-200 px-4 py-3 text-sm outline-none focus:border-forest-600"
-        />
-        <Button type="submit" disabled={busy}>
-          <Send className="h-4 w-4" />
-          Send
-        </Button>
-      </form>
+          <div>
+            <h3 className="font-semibold text-stone-900">
+              SmartAgriAI Assistant
+            </h3>
+
+            <p className="text-sm text-stone-500">
+              Your conversation is saved to your account.
+            </p>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
+        <div className="mb-5 min-h-40 space-y-4 rounded-xl bg-stone-50 p-4">
+          {messages.length === 0 ? (
+            <div className="flex min-h-32 items-center justify-center text-center text-sm text-stone-500">
+              Start a conversation by asking an agriculture-related question.
+            </div>
+          ) : (
+            messages.map((item, index) => (
+              <div key={index} className="space-y-3">
+                <div className="ml-auto max-w-[85%] rounded-xl bg-forest-800 px-4 py-3 text-sm text-white">
+                  {item.user}
+                </div>
+
+                <div className="max-w-[85%] rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-700">
+                  {item.bot}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-stone-700">
+              Topic
+            </label>
+
+            <select
+              value={topic}
+              onChange={(event) => setTopic(event.target.value)}
+              className="w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm outline-none focus:border-forest-600"
+            >
+              <option>General Agriculture</option>
+              <option>Soil Health</option>
+              <option>Crop Recommendation</option>
+              <option>Fertilizer</option>
+              <option>Weather</option>
+              <option>Pest and Disease</option>
+              <option>Irrigation</option>
+            </select>
+          </div>
+
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              placeholder="Ask your farming question..."
+              className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm outline-none focus:border-forest-600"
+            />
+
+            <Button
+              type="submit"
+              disabled={loading || !profile?.id || !message.trim()}
+            >
+              {loading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
-  )
+  );
 }

@@ -12,7 +12,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
-import SoilAnalysis from "./pages/SoilAnalysis";
 import Weather from "./pages/Weather";
 
 function ProtectedRoute({ children }) {
@@ -44,7 +43,6 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/soil-analysis" element={<SoilAnalysis />} />
             <Route
               path="/crop-recommendation"
               element={<CropRecommendation />}

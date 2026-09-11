@@ -1,91 +1,245 @@
-import Button from "../components/ui/Button"
-import Card from "../components/ui/Card"
-import Input, { Select } from "../components/ui/Input"
-import { languages } from "../data/mockData"
-import { useApp } from "../context/AppContext"
+import { useEffect, useState } from "react";
+import { CheckCircle, Loader2, User } from "lucide-react";
+
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import { getCurrentUser, updateCurrentUser } from "../services/api";
+import { useApp } from "../context/AppContext";
 
 export default function Settings() {
-  const { language, setLanguage, profile, setProfile, notificationsOn, setNotificationsOn } = useApp()
+  const { profile, setProfile } = useApp();
 
-  function saveProfile(event) {
-    event.preventDefault()
-    const data = new FormData(event.target)
-    setProfile((prev) => ({
-      ...prev,
-      name: data.get("name"),
-      email: data.get("email"),
-      farmName: data.get("farmName"),
-      location: data.get("location"),
-      fieldSizeAcres: Number(data.get("fieldSize")),
-    }))
+  const [form, setForm] = useState({
+    full_name: "",
+    phone: "",
+    profile_image: "",
+    address: "",
+    is_active: true,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  async function loadProfile() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const user = await getCurrentUser();
+
+      setProfile(user);
+
+      setForm({
+        full_name: user.full_name || "",
+        phone: user.phone || "",
+        profile_image: user.profile_image || "",
+        address: user.address || "",
+        is_active: user.is_active ?? true,
+      });
+    } catch (err) {
+      setError(err.message || "Failed to load profile.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleChange(event) {
+    const { name, value } = event.target;
+
+    setForm((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    try {
+      setSaving(true);
+      setError("");
+      setSuccess("");
+
+      const payload = {
+        full_name: form.full_name,
+        phone: form.phone,
+        profile_image: form.profile_image,
+        address: form.address,
+        is_active: form.is_active,
+      };
+
+      const updatedUser = await updateCurrentUser(payload);
+
+      setProfile(updatedUser);
+
+      setForm({
+        full_name: updatedUser.full_name || "",
+        phone: updatedUser.phone || "",
+        profile_image: updatedUser.profile_image || "",
+        address: updatedUser.address || "",
+        is_active: updatedUser.is_active ?? true,
+      });
+
+      setSuccess("Profile updated successfully.");
+    } catch (err) {
+      setError(err.message || "Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex min-h-64 items-center justify-center">
+        <Loader2 className="h-7 w-7 animate-spin text-forest-700" />
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold text-stone-900">Settings</h2>
-        <p className="mt-1 text-stone-500">Profile, farm context and language stay on this device for the demo.</p>
+
+        <p className="mt-1 text-stone-500">Manage your SmartAgriAI profile.</p>
       </div>
 
-      <form onSubmit={saveProfile} className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <h3 className="font-semibold">Profile</h3>
-          <div className="mt-4 space-y-3">
-            <Input name="name" label="Name" defaultValue={profile.name} />
-            <Input name="email" type="email" label="Email" defaultValue={profile.email} />
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          <CheckCircle className="h-4 w-4" />
+          {success}
+        </div>
+      )}
+
+      <Card>
+        <div className="mb-6 flex items-center gap-3">
+          <div className="rounded-xl bg-emerald-100 p-3">
+            <User className="h-6 w-6 text-forest-700" />
           </div>
-        </Card>
-        <Card>
-          <h3 className="font-semibold">Farm information</h3>
-          <div className="mt-4 space-y-3">
-            <Input name="farmName" label="Farm name" defaultValue={profile.farmName} />
-            <Input name="location" label="Location" defaultValue={profile.location} />
-            <Input name="fieldSize" type="number" step="0.1" label="Field size (acres)" defaultValue={profile.fieldSizeAcres} />
+
+          <div>
+            <h3 className="font-semibold text-stone-900">
+              Profile Information
+            </h3>
+
+            <p className="text-sm text-stone-500">
+              Update your personal information.
+            </p>
           </div>
-          <Button type="submit" className="mt-4">
-            Save farm context
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="grid gap-5 md:grid-cols-2">
+            <Input
+              label="Full Name"
+              name="full_name"
+              value={form.full_name}
+              onChange={handleChange}
+              placeholder="Your full name"
+              required
+            />
+
+            <Input
+              label="Phone"
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              placeholder="Your phone number"
+            />
+
+            <Input
+              label="Profile Image URL"
+              name="profile_image"
+              value={form.profile_image}
+              onChange={handleChange}
+              placeholder="https://example.com/photo.jpg"
+            />
+
+            <Input
+              label="Address"
+              name="address"
+              value={form.address}
+              onChange={handleChange}
+              placeholder="Your address"
+            />
+          </div>
+
+          <div className="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50 p-4">
+            <input
+              id="is_active"
+              type="checkbox"
+              checked={form.is_active}
+              onChange={(event) =>
+                setForm((previous) => ({
+                  ...previous,
+                  is_active: event.target.checked,
+                }))
+              }
+              className="h-4 w-4 rounded border-stone-300"
+            />
+
+            <label
+              htmlFor="is_active"
+              className="text-sm font-medium text-stone-700"
+            >
+              Account active
+            </label>
+          </div>
+
+          <div className="border-t border-stone-200 pt-5">
+            <h4 className="mb-3 text-sm font-semibold text-stone-700">
+              Account Information
+            </h4>
+
+            <div className="grid gap-3 text-sm sm:grid-cols-3">
+              <div>
+                <p className="text-xs text-stone-400">Email</p>
+                <p className="font-medium text-stone-800">
+                  {profile?.email || "N/A"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-stone-400">Role</p>
+                <p className="font-medium capitalize text-stone-800">
+                  {profile?.role || "N/A"}
+                </p>
+              </div>
+
+              <div>
+                <p className="text-xs text-stone-400">User ID</p>
+                <p className="font-medium text-stone-800">
+                  {profile?.id ?? "N/A"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Button type="submit" disabled={saving}>
+            {saving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </Button>
-        </Card>
-      </form>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <h3 className="font-semibold">Language</h3>
-          <p className="mt-1 text-sm text-stone-500">
-            Selector is live. Full Hindi and Marathi strings can be added to `src/i18n/strings.js` later.
-          </p>
-          <div className="mt-4">
-            <Select value={language} onChange={(e) => setLanguage(e.target.value)}>
-              {languages.map((lang) => (
-                <option key={lang.id} value={lang.id}>
-                  {lang.label}
-                </option>
-              ))}
-            </Select>
-          </div>
-        </Card>
-        <Card>
-          <h3 className="font-semibold">Notifications</h3>
-          <div className="mt-4 space-y-3 text-sm">
-            {Object.entries(notificationsOn).map(([key, value]) => (
-              <label key={key} className="flex items-center justify-between rounded-xl bg-mist px-3 py-3">
-                <span className="capitalize">{key} alerts</span>
-                <input
-                  type="checkbox"
-                  checked={value}
-                  onChange={(e) => setNotificationsOn((prev) => ({ ...prev, [key]: e.target.checked }))}
-                />
-              </label>
-            ))}
-          </div>
-        </Card>
-        <Card className="lg:col-span-2">
-          <h3 className="font-semibold">Preferences</h3>
-          <p className="mt-2 text-sm text-stone-500">
-            Units stay metric (kg/ha). Currency display uses ₹ for the demo. No analytics cookies are collected.
-          </p>
-        </Card>
-      </div>
+        </form>
+      </Card>
     </div>
-  )
+  );
 }
