@@ -61,7 +61,7 @@ from .satellite_monitoring import (
     SatelliteMonitoringResponse,
 )
 
-from .chatbot_history import (
+from .chatbot import (
     ChatbotHistoryCreate,
     ChatbotHistoryUpdate,
     ChatbotHistoryResponse,

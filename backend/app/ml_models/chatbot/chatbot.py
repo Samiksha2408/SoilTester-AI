@@ -1,41 +1,118 @@
+import os
+from typing import Optional
+from dotenv import load_dotenv
+from google import genai
+
 from .memory import ChatMemory
 from .prompt import SYSTEM_PROMPT
 
+load_dotenv()
 
 class SoilChatbot:
     """
-    Basic chatbot implementation.
+    AI-powered agricultural chatbot for SoilTester-AI.
 
-    Replace the generate_response() method with
-    Gemini, OpenAI, Ollama, or another LLM later.
+    Uses Gemini for natural-language responses and maintains
+    short-term conversation memory.
     """
 
     def __init__(self):
-
         self.memory = ChatMemory()
+
+        api_key = os.getenv("GEMINI_API_KEY")
+
+        if not api_key:
+            raise ValueError(
+                "GEMINI_API_KEY is not configured."
+            )
+
+        self.client = genai.Client(
+            api_key=api_key
+        )
+
+        self.model_name = os.getenv(
+            "GEMINI_MODEL",
+            "gemini-3.6-flash"
+        )
 
     def generate_response(
         self,
         user_message: str,
-    ):
+        context: Optional[str] = None,
+    ) -> str:
 
         self.memory.add_message(
             "user",
             user_message,
         )
 
-        response = (
-            "Thank you for your question. "
-            "The AI chatbot integration is currently under development. "
-            "This module will soon provide personalized agricultural guidance."
+        history = self.memory.get_history()
+
+        prompt_parts = [
+            SYSTEM_PROMPT
+        ]
+
+        # Add SoilTester user context if available
+        if context:
+            prompt_parts.append(
+                f"""
+USER AGRICULTURE CONTEXT:
+
+{context}
+"""
+            )
+
+        # Add previous conversation
+        if history:
+
+            prompt_parts.append(
+                "\nCONVERSATION HISTORY:"
+            )
+
+            for message in history[:-1]:
+
+                prompt_parts.append(
+                    f"{message['role'].upper()}: "
+                    f"{message['message']}"
+                )
+
+        # Add current question
+        prompt_parts.append(
+            f"""
+CURRENT USER QUESTION:
+
+{user_message}
+"""
         )
+
+        prompt = "\n\n".join(prompt_parts)
+
+        try:
+
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+            )
+
+            answer = response.text.strip()
+
+        except Exception as e:
+
+            print(
+                f"SoilTester AI chatbot error: {e}"
+            )
+
+            answer = (
+                "I'm sorry, I couldn't process your "
+                "question right now. Please try again."
+            )
 
         self.memory.add_message(
             "assistant",
-            response,
+            answer,
         )
 
-        return response
+        return answer
 
     def conversation(self):
 

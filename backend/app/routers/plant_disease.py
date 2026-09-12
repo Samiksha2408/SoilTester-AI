@@ -3,6 +3,7 @@ import os
 import shutil
 import tempfile
 from app.ml_models.plant_disease.predictor import plant_disease_predictor
+from app.ml_models.plant_disease.disease_info import DISEASE_INFO
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -87,12 +88,28 @@ async def predict_plant_disease(
         result = plant_disease_predictor.predict(
             temp_path
         )
+        disease_code = result["disease"]
+        confidence = result["confidence"]
+
+        # Get disease information
+        info = DISEASE_INFO.get(
+            disease_code,)
+        
+        if info is None:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Disease information not found for: {disease_code}"
+            )
 
         return {
             "success": True,
             "filename": image.filename,
             "disease": result["disease"],
             "confidence": result["confidence"],
+            "crop": info["crop"],
+            "recommendations": info["recommendations"],
+            "symptoms": info["symptoms"],
+            "prevention": info["prevention"],
         }
 
     except Exception as e:
