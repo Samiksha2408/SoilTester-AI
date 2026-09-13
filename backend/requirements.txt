@@ -48,7 +48,7 @@ namex==0.1.0
 narwhals==2.25.0
 nbformat==5.11.1
 numpy==2.2.6
-opt_einsum==3.4.0
+opt_einsum==3.3.0
 optree==0.20.0
 packaging==26.3
 passlib==1.7.4
@@ -93,11 +93,11 @@ uvicorn==0.52.4
 uvloop==0.22.1; sys_platform != 'win32'
 watchfiles==1.2.0
 webencodings==0.6.1
-websockets==17.1
+websockets==16.0
 wheel==0.48.0
 wrapt==2.3.0
 pandas==2.3.2
 opencv-python-headless==4.12.0.88
 paddleocr==3.7.0
 pdf2image==1.17.0
-google-genai
+google-genai==2.23.0
