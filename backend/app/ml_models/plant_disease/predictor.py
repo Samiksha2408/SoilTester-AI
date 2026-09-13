@@ -49,4 +49,12 @@ class PlantDiseasePredictor:
 
 
 # Singleton instance
-plant_disease_predictor = PlantDiseasePredictor()
+plant_disease_predictor = None
+
+def get_plant_disease_predictor():
+    global plant_disease_predictor
+
+    if plant_disease_predictor is None:
+        plant_disease_predictor = PlantDiseasePredictor()
+
+    return plant_disease_predictor

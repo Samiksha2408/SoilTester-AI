@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status,UploadFile, File
 import os
 import shutil
 import tempfile
-from app.ml_models.plant_disease.predictor import plant_disease_predictor
+from app.ml_models.plant_disease.predictor import get_plant_disease_predictor
 from app.ml_models.plant_disease.disease_info import DISEASE_INFO
 from sqlalchemy.orm import Session
 
@@ -83,9 +83,24 @@ async def predict_plant_disease(
 
         temp_path = temp_file.name
 
+        plant_disease_predictor = None
+
+
+        def get_plant_disease_predictor():
+            global plant_disease_predictor
+
+            if plant_disease_predictor is None:
+                from app.ml_models.plant_disease.predictor import (
+                    plant_disease_predictor as predictor
+        )
+        plant_disease_predictor = predictor
+
+        return plant_disease_predictor
+
     try:
         # Run ML prediction
-        result = plant_disease_predictor.predict(
+        predictor = get_plant_disease_predictor()
+        result = predictor.predict(
             temp_path
         )
         disease_code = result["disease"]
