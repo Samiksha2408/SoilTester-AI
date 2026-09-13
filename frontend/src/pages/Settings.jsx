@@ -34,7 +34,14 @@ export default function Settings() {
 
       const user = await getCurrentUser();
 
-      setProfile(user);
+      setProfile({
+        name: user.full_name,
+        email: user.email,
+        role: user.role,
+        farmName: user.farm_name || "",
+        location: user.address || "",
+        fieldSizeAcres: user.field_size_acres || 0,
+      });
 
       setForm({
         full_name: user.full_name || "",
@@ -77,7 +84,14 @@ export default function Settings() {
 
       const updatedUser = await updateCurrentUser(payload);
 
-      setProfile(updatedUser);
+      setProfile({
+        name: updatedUser.full_name,
+        email: updatedUser.email,
+        role: updatedUser.role,
+        farmName: updatedUser.farm_name || "",
+        location: updatedUser.address || "",
+        fieldSizeAcres: updatedUser.field_size_acres || 0,
+      });
 
       setForm({
         full_name: updatedUser.full_name || "",

@@ -39,6 +39,11 @@ const pages = [
     path: "/settings",
     keywords: "settings profile preferences",
   },
+  {
+    name: "Plant Disease",
+    path: "/plant-disease",
+    keywords: "plant disease detection leaf diagnosis",
+  },
 ];
 
 const titles = {
@@ -49,6 +54,7 @@ const titles = {
   "/reports": "Reports",
   "/ai-assistant": "AI Assistant",
   "/settings": "Settings",
+  "/plant-disease": "Plant Disease",
 };
 
 export default function Topbar({ onMenu }) {
@@ -65,7 +71,7 @@ export default function Topbar({ onMenu }) {
 
   const title = titles[pathname] || "SmartAgriAI";
 
-  const fullName = profile?.full_name || "Farmer";
+  const fullName = profile?.name || "Farmer";
   const firstLetter = fullName.charAt(0).toUpperCase();
 
   const filteredPages =

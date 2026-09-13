@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import AppLayout from "./components/dashboard/AppLayout";
 import { AppProvider, useApp } from "./context/AppContext";
-
+import PlantDisease from "./pages/PlantDisease";
 import AIAssistant from "./pages/AIAssistant";
 import CropRecommendation from "./pages/CropRecommendation";
 import Dashboard from "./pages/Dashboard";
@@ -47,6 +47,7 @@ export default function App() {
               path="/crop-recommendation"
               element={<CropRecommendation />}
             />
+            <Route path="/plant-disease" element={<PlantDisease />} />
             <Route path="/weather" element={<Weather />} />
             <Route path="/fertilizer-plan" element={<FertilizerPlan />} />
             <Route path="/reports" element={<Reports />} />

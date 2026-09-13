@@ -1,71 +1,99 @@
-import { Globe, Mail, Sprout } from "lucide-react"
-import { Link } from "react-router-dom"
+import { ArrowUpRight, Leaf } from "lucide-react";
+import { Link } from "react-router-dom";
+import Logo from "../ui/Logo";
+
+const productLinks = [
+  { label: "Features", href: "#features" },
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Why SmartAgriAI", href: "#about" },
+];
+
+const accountLinks = [
+  { label: "Sign In", href: "/login" },
+  { label: "Get Started", href: "/register" },
+];
 
 export default function Footer() {
   return (
-    <footer id="contact" className="border-t border-stone-200 bg-white px-4 py-12 sm:px-6">
-      <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <div className="mb-3 flex items-center gap-2 font-bold text-forest-950">
-            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-forest-800 text-white">
-              <Sprout className="h-4 w-4" />
-            </span>
-            SmartAgriAI
+    <footer className="border-t border-stone-200 bg-stone-50 px-4 pb-6 pt-14 sm:px-6">
+      <div className="mx-auto max-w-6xl">
+        {/* Main footer */}
+        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr]">
+          {/* Brand */}
+          <div className="max-w-sm">
+            <div>
+              <Logo />
+            </div>
+
+            <p className="mt-4 text-sm leading-relaxed text-stone-500">
+              AI-powered farm intelligence that helps turn soil and farm data
+              into clearer, smarter farming decisions.
+            </p>
+
+            <div className="mt-5 inline-flex items-center gap-2 rounded-full border border-emerald-100 bg-white px-3 py-1.5 text-xs font-medium text-forest-700">
+              <Leaf className="h-3.5 w-3.5" />
+              Smarter farming, one decision at a time.
+            </div>
           </div>
-          <p className="text-sm leading-relaxed text-stone-500">
-            An AI-assisted agriculture workspace for soil, crops, nutrients and farm reports. Demo data only until
-            the backend is connected.
-          </p>
+
+          {/* Product */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-stone-400">
+              Explore
+            </p>
+
+            <div className="mt-4 space-y-3">
+              {productLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  className="block text-sm text-stone-600 transition hover:text-forest-800"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Account */}
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-stone-400">
+              Account
+            </p>
+
+            <div className="mt-4 space-y-3">
+              {accountLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className="group flex items-center gap-1 text-sm text-stone-600 transition hover:text-forest-800"
+                >
+                  {link.label}
+
+                  {link.label === "Get Started" && (
+                    <ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-semibold text-stone-900">Quick Links</p>
-          <ul className="mt-3 space-y-2 text-sm text-stone-500">
-            <li>
-              <a href="#home" className="hover:text-forest-800">
-                Home
-              </a>
-            </li>
-            <li>
-              <a href="#how-it-works" className="hover:text-forest-800">
-                How it works
-              </a>
-            </li>
-            <li>
-              <Link to="/dashboard" className="hover:text-forest-800">
-                Open app
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-stone-900">Features</p>
-          <ul className="mt-3 space-y-2 text-sm text-stone-500">
-            <li>Soil analysis</li>
-            <li>Crop recommendation</li>
-            <li>Fertilizer planning</li>
-            <li>AI assistant</li>
-          </ul>
-        </div>
-        <div>
-          <p className="text-sm font-semibold text-stone-900">Contact</p>
-          <ul className="mt-3 space-y-2 text-sm text-stone-500">
-            <li>hello@smartagriai.demo</li>
-            <li>Campus project desk</li>
-            <li>India</li>
-          </ul>
-          <div className="mt-4 flex gap-3 text-stone-400">
-            <a aria-label="Email" href="mailto:hello@smartagriai.demo" className="hover:text-forest-800">
-              <Mail className="h-4 w-4" />
-            </a>
-            <a aria-label="Project site placeholder" href="#contact" className="hover:text-forest-800">
-              <Globe className="h-4 w-4" />
-            </a>
+
+        {/* Bottom */}
+        <div className="mt-12 flex flex-col gap-3 border-t border-stone-200 pt-5 text-xs text-stone-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>© {new Date().getFullYear()} SmartAgriAI. All rights reserved.</p>
+
+          <div className="flex items-center gap-4">
+            <span>Built for smarter agriculture</span>
+
+            <span className="h-1 w-1 rounded-full bg-stone-300" />
+
+            <Link to="/" className="transition hover:text-forest-700">
+              Back to top ↑
+            </Link>
           </div>
         </div>
       </div>
-      <p className="mx-auto mt-10 max-w-6xl border-t border-stone-100 pt-6 text-xs text-stone-400">
-        © {new Date().getFullYear()} SmartAgriAI. Academic demonstration. Not a certified agronomy service.
-      </p>
     </footer>
-  )
+  );
 }

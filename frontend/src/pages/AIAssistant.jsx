@@ -4,11 +4,8 @@ import { Bot, Send, Loader2 } from "lucide-react";
 import Card from "../components/ui/Card";
 import Button from "../components/ui/Button";
 import { sendAIMessage } from "../services/api";
-import { useApp } from "../context/AppContext";
 
 export default function AIAssistant() {
-  const { profile } = useApp();
-
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [topic, setTopic] = useState("General Agriculture");
@@ -20,46 +17,31 @@ export default function AIAssistant() {
 
     const userMessage = message.trim();
 
-    if (!userMessage || loading || !profile?.id) {
+    if (!userMessage || loading) {
       return;
     }
 
     setLoading(true);
     setError("");
 
-    const startTime = performance.now();
-
     try {
-      // The current backend endpoint saves conversation history.
-      // It does not generate an AI response yet.
-      const botResponse =
-        "Your question has been recorded. AI-powered recommendations will be available when the AI generation service is connected.";
-
-      const responseTime = (performance.now() - startTime) / 1000;
-
-      const payload = {
-        user_message: userMessage,
-        bot_response: botResponse,
-        topic,
-        model_name: "SmartAgriAI",
-        response_time: responseTime,
-        user_id: Number(profile.id),
-      };
-
-      await sendAIMessage(payload);
+      const result = await sendAIMessage({
+        message: userMessage,
+        context: topic,
+      });
 
       setMessages((previous) => [
         ...previous,
         {
           user: userMessage,
-          bot: botResponse,
+          bot: result.response,
         },
       ]);
 
       setMessage("");
     } catch (err) {
       console.error("AI Assistant error:", err);
-      setError(err.message || "Failed to save conversation.");
+      setError(err.message || "Failed to get an AI response.");
     } finally {
       setLoading(false);
     }
@@ -87,7 +69,8 @@ export default function AIAssistant() {
             </h3>
 
             <p className="text-sm text-stone-500">
-              Your conversation is saved to your account.
+              Ask your agriculture-related questions and get AI-powered
+              guidance.
             </p>
           </div>
         </div>
@@ -115,6 +98,15 @@ export default function AIAssistant() {
                 </div>
               </div>
             ))
+          )}
+
+          {loading && (
+            <div className="max-w-[85%] rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-500">
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Thinking...</span>
+              </div>
+            </div>
           )}
         </div>
 
@@ -145,13 +137,11 @@ export default function AIAssistant() {
               value={message}
               onChange={(event) => setMessage(event.target.value)}
               placeholder="Ask your farming question..."
+              maxLength={2000}
               className="min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm outline-none focus:border-forest-600"
             />
 
-            <Button
-              type="submit"
-              disabled={loading || !profile?.id || !message.trim()}
-            >
+            <Button type="submit" disabled={loading || !message.trim()}>
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (

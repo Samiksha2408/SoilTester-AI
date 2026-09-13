@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   LogOut,
   MessageSquare,
+  ScanSearch,
   Settings,
   Sprout,
   Wheat,
@@ -21,6 +22,7 @@ const items = [
   { to: "/weather", label: "Weather", icon: CloudSun },
   { to: "/fertilizer-plan", label: "Fertilizer Plan", icon: Sprout },
   { to: "/reports", label: "Reports", icon: FileText },
+  { to: "/plant-disease", label: "Plant Disease", icon: ScanSearch },
   { to: "/ai-assistant", label: "AI Assistant", icon: MessageSquare },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

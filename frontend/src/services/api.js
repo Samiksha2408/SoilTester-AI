@@ -149,8 +149,17 @@ export function getFertilizerRecommendations() {
 }
 
 export function sendAIMessage(payload) {
-  return request("/chatbot/", {
+  return request("/chatbot/chat", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+export function predictPlantDisease(imageFile) {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  return request("/plant-disease/predict", {
+    method: "POST",
+    body: formData,
   });
 }
