@@ -15,11 +15,19 @@ from app.schemas.chatbot import ChatbotRequest, ChatbotResponse
 router = APIRouter(
     tags=["AI Chatbot"],
 )
+# Lazy chatbot initialization
+# The Gemini chatbot will NOT be created when FastAPI starts.
+# It will only be created when the first chatbot request is made.
+chatbot = None
 
 
-# Create chatbot instance
-chatbot = SoilChatbot()
+def get_chatbot():
+    global chatbot
 
+    if chatbot is None:
+        chatbot = SoilChatbot()
+
+    return chatbot
 
 @router.post(
     "/chat",
