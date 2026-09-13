@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.repositories.chatbot_history_repository import (
     ChatbotHistoryRepository,
 )
-from app.schemas.chatbot_history import (
+from app.schemas.chatbot import (
     ChatbotHistoryCreate,
     ChatbotHistoryUpdate,
 )

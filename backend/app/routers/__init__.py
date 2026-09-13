@@ -10,7 +10,8 @@ from app.routers.plant_disease import router as plant_disease_router
 from app.routers.irrigation import router as irrigation_router
 from app.routers.government_scheme import router as government_router
 from app.routers.satellite_monitoring import router as satellite_router
-from app.routers.chatbot_history import router as chatbot_router
+from app.routers.chatbot import router as chatbot_router
+from app.routers.soil_analysis import router as soil_analysis_router
 
 api_router = APIRouter()
 
@@ -30,6 +31,12 @@ api_router.include_router(
     crop_router,
     prefix="/crop-recommendation",
     tags=["Crop Recommendation"],
+)
+
+api_router.include_router(
+    soil_analysis_router,
+    prefix="/soil-analysis",
+    tags=["Soil Analysis"],
 )
 
 # Fertilizer Recommendation
@@ -80,3 +87,4 @@ api_router.include_router(
     prefix="/chatbot",
     tags=["Chatbot"],
 )
+

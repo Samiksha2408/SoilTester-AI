@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
 from app.model.chatbot_history import ChatbotHistory
-from app.schemas.chatbot_history import (
+from app.schemas.chatbot import (
     ChatbotHistoryCreate,
     ChatbotHistoryUpdate,
 )
