@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
 from app.ml_models.weather_prediction.predictor import weather_predictor
+from app.services.weather_service import WeatherService
 
 from app.database import get_db
 from app.model.weather import Weather
@@ -87,6 +88,27 @@ def predict_weather(
             detail=f"Weather prediction failed: {str(e)}",
         )
 
+
+# --------------------------------
+# Real-Time Weather + Crop Advice
+# --------------------------------
+@router.get("/dashboard")
+async def weather_dashboard(
+    city: str,
+):
+    try:
+        return await WeatherService.get_weather_dashboard(city)
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Weather dashboard failed: {str(e)}",
+        )
+    
+    
 # --------------------------------
 # Get Weather Record By ID
 # --------------------------------
