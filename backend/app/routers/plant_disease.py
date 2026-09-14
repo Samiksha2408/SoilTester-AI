@@ -93,7 +93,7 @@ async def predict_plant_disease(
                 from app.ml_models.plant_disease.predictor import (
                     plant_disease_predictor as predictor
         )
-        plant_disease_predictor = predictor
+        result = plant_disease_predictor.predict(temp_path)
 
         return plant_disease_predictor
 
