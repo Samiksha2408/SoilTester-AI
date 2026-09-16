@@ -95,6 +95,16 @@ async def predict_plant_disease(
         # Get the trained ML predictor
         predictor = get_plant_disease_predictor()
 
+        print("PLANT DISEASE: Getting predictor", flush=True)
+
+        predictor = get_plant_disease_predictor()
+
+        print("PLANT DISEASE: Predictor loaded", flush=True)
+
+        result = predictor.predict(temp_path)
+
+        print("PLANT DISEASE: Prediction completed", flush=True)
+
         # Run prediction
         result = predictor.predict(temp_path)
 
