@@ -105,6 +105,22 @@ async def predict_plant_disease(
 
         print("PLANT DISEASE: Prediction completed", flush=True)
 
+        return {
+        "success": True,
+        "result": result
+    }
+
+    except Exception as e:
+        print(f"PLANT DISEASE ERROR: {repr(e)}", flush=True)
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+    )
+
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)    
+
         # Run prediction
         result = predictor.predict(temp_path)
 
@@ -131,19 +147,6 @@ async def predict_plant_disease(
             "prevention": info["prevention"],
         }
 
-    except HTTPException:
-        raise
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=f"Prediction failed: {str(e)}",
-        )
-
-    finally:
-        # Delete temporary image
-        if temp_path and os.path.exists(temp_path):
-            os.remove(temp_path)
 
 
 # --------------------------------
