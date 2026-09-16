@@ -1,13 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status,UploadFile, File
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 import os
 import shutil
 import tempfile
+
 from app.ml_models.plant_disease.predictor import get_plant_disease_predictor
 from app.ml_models.plant_disease.disease_info import DISEASE_INFO
+
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.model.plant_disease import PlantDisease
+
 from app.schemas.plant_disease import (
     PlantDiseaseCreate,
     PlantDiseaseUpdate,
@@ -51,6 +54,9 @@ def get_plant_diseases(
     return db.query(PlantDisease).all()
 
 
+# --------------------------------
+# Plant Disease Prediction
+# --------------------------------
 @router.post("/predict")
 async def predict_plant_disease(
     image: UploadFile = File(...)
@@ -65,80 +71,71 @@ async def predict_plant_disease(
     if image.content_type not in allowed_types:
         raise HTTPException(
             status_code=400,
-            detail="Only JPG and PNG images are allowed"
+            detail="Only JPG and PNG images are allowed",
         )
 
     # Create temporary file
     suffix = os.path.splitext(image.filename or "")[1]
 
-    with tempfile.NamedTemporaryFile(
-        delete=False,
-        suffix=suffix
-    ) as temp_file:
-
-        shutil.copyfileobj(
-            image.file,
-            temp_file
-        )
-
-        temp_path = temp_file.name
-
-        plant_disease_predictor = None
-
-
-        def get_plant_disease_predictor():
-            global plant_disease_predictor
-
-            if plant_disease_predictor is None:
-                from app.ml_models.plant_disease.predictor import (
-                    plant_disease_predictor as predictor
-        )
-        result = plant_disease_predictor.predict(temp_path)
-
-        return plant_disease_predictor
+    temp_path = None
 
     try:
-        # Run ML prediction
+        with tempfile.NamedTemporaryFile(
+            delete=False,
+            suffix=suffix,
+        ) as temp_file:
+
+            shutil.copyfileobj(
+                image.file,
+                temp_file,
+            )
+
+            temp_path = temp_file.name
+
+        # Get the trained ML predictor
         predictor = get_plant_disease_predictor()
-        result = predictor.predict(
-            temp_path
-        )
+
+        # Run prediction
+        result = predictor.predict(temp_path)
+
         disease_code = result["disease"]
         confidence = result["confidence"]
 
         # Get disease information
-        info = DISEASE_INFO.get(
-            disease_code,)
-        
+        info = DISEASE_INFO.get(disease_code)
+
         if info is None:
             raise HTTPException(
                 status_code=500,
-                detail=f"Disease information not found for: {disease_code}"
+                detail=f"Disease information not found for: {disease_code}",
             )
 
         return {
             "success": True,
             "filename": image.filename,
-            "disease": result["disease"],
-            "confidence": result["confidence"],
+            "disease": disease_code,
+            "confidence": confidence,
             "crop": info["crop"],
             "recommendations": info["recommendations"],
             "symptoms": info["symptoms"],
             "prevention": info["prevention"],
         }
 
+    except HTTPException:
+        raise
+
     except Exception as e:
         raise HTTPException(
             status_code=500,
-            detail=f"Prediction failed: {str(e)}"
+            detail=f"Prediction failed: {str(e)}",
         )
 
     finally:
         # Delete temporary image
-        if os.path.exists(temp_path):
+        if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
 
-            
+
 # --------------------------------
 # Get Plant Disease By ID
 # --------------------------------
