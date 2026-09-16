@@ -44,6 +44,8 @@ def chat_with_ai(
     """
 
     start_time = time.perf_counter()
+    # Initialize chatbot only when the first request is made
+    bot = get_chatbot()
 
     # Generate AI response
     answer = chatbot.generate_response(
