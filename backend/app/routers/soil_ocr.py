@@ -9,38 +9,29 @@ from fastapi import (
 
 from app.utils.file_handler import save_uploaded_file
 
-from app.services.image_preprocessing import (
-    preprocess_image
-)
-
-from app.services.ocr_service import (
-    OCRService
-)
-
-from app.services.soil_parser import (
-    SoilParser
-)
-
-from app.services.pdf_service import (
-    pdf_to_images
-)
-
-
 router = APIRouter(
     prefix="/soil-ocr",
     tags=["Soil OCR"]
 )
 
 
-# Services
-ocr_service = OCRService()
-soil_parser = SoilParser()
-
-
 @router.post("/extract")
 async def extract_soil_report(
     file: UploadFile = File(...)
 ):
+    try:
+        from app.services.image_preprocessing import preprocess_image
+        from app.services.ocr_service import OCRService
+        from app.services.soil_parser import SoilParser
+        from app.services.pdf_service import pdf_to_images
+    except ModuleNotFoundError as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Soil OCR dependencies are not installed: {exc}",
+        ) from exc
+
+    ocr_service = OCRService()
+    soil_parser = SoilParser()
 
     # --------------------------------
     # 1. Allowed file types

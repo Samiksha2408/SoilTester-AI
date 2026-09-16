@@ -8,7 +8,6 @@ from app.auth.oauth2 import get_current_active_user
 from app.database import get_db
 from app.model.user import User
 from app.model.chatbot_history import ChatbotHistory
-from app.ml_models.chatbot.chatbot import SoilChatbot
 from app.schemas.chatbot import ChatbotRequest, ChatbotResponse
 
 
@@ -25,6 +24,7 @@ def get_chatbot():
     global chatbot
 
     if chatbot is None:
+        from app.ml_models.chatbot.chatbot import SoilChatbot
         chatbot = SoilChatbot()
 
     return chatbot

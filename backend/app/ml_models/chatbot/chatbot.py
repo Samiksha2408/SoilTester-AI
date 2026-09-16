@@ -1,7 +1,11 @@
 import os
 from typing import Optional
 from dotenv import load_dotenv
-from google import genai
+
+try:
+    from google import genai
+except ImportError:
+    genai = None
 
 from .memory import ChatMemory
 from .prompt import SYSTEM_PROMPT
@@ -17,6 +21,11 @@ class SoilChatbot:
     """
 
     def __init__(self):
+        if genai is None:
+            raise ModuleNotFoundError(
+                "The Google GenAI SDK is not installed. Install backend requirements to use the chatbot."
+            )
+
         self.memory = ChatMemory()
 
         api_key = os.getenv("GEMINI_API_KEY")

@@ -2,8 +2,14 @@ import json
 import os
 
 import numpy as np
-from tensorflow.keras.models import load_model
 
+try:
+    from tensorflow.keras.models import load_model
+except ModuleNotFoundError as exc:
+    load_model = None
+    _TENSORFLOW_IMPORT_ERROR = exc
+else:
+    _TENSORFLOW_IMPORT_ERROR = None
 
 from .preprocess import PlantDiseasePreprocessor
 
@@ -14,6 +20,11 @@ class PlantDiseasePredictor:
     """
 
     def __init__(self):
+        if load_model is None:
+            raise ModuleNotFoundError(
+                "TensorFlow is required for plant disease prediction. "
+                "Install the backend requirements before using this feature."
+            ) from _TENSORFLOW_IMPORT_ERROR
 
         base_dir = os.path.dirname(__file__)
 

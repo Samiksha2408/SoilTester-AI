@@ -5,7 +5,10 @@ os.environ.setdefault("OMP_NUM_THREADS", "1")
 os.environ.setdefault("MKL_NUM_THREADS", "1")
 os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 
-from paddleocr import PaddleOCR
+try:
+    from paddleocr import PaddleOCR
+except ModuleNotFoundError:
+    PaddleOCR = None
 
 
 class OCRService:
@@ -15,6 +18,11 @@ class OCRService:
 
     def _get_ocr(self):
         if self.ocr is None:
+            if PaddleOCR is None:
+                raise ModuleNotFoundError(
+                    "PaddleOCR is not installed. Install the backend requirements to use soil OCR."
+                )
+
             print("Initializing PaddleOCR...")
 
             self.ocr = PaddleOCR(
