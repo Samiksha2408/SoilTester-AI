@@ -3,80 +3,133 @@ import {
   Droplets,
   Gauge,
   MapPin,
+  Search,
   Thermometer,
   Wind,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import Card from "../components/ui/Card";
-import { getWeather } from "../services/api";
+import { getWeatherDashboard } from "../services/api";
 
-function sortByLatest(records) {
-  if (!Array.isArray(records)) {
-    return [];
+function safeText(value) {
+  if (value === null || value === undefined) {
+    return "";
   }
 
-  return [...records].sort(
-    (a, b) =>
-      new Date(b.created_at || 0).getTime() -
-      new Date(a.created_at || 0).getTime(),
-  );
+  if (typeof value === "string" || typeof value === "number") {
+    return String(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => safeText(item)).join(", ");
+  }
+
+  if (typeof value === "object") {
+    if (value.prediction !== undefined) {
+      return safeText(value.prediction);
+    }
+
+    if (value.message !== undefined) {
+      return safeText(value.message);
+    }
+
+    if (value.advice !== undefined) {
+      return safeText(value.advice);
+    }
+
+    if (value.reason !== undefined) {
+      return safeText(value.reason);
+    }
+
+    return Object.entries(value)
+      .map(([key, val]) => `${key}: ${safeText(val)}`)
+      .join(" • ");
+  }
+
+  return String(value);
+}
+
+function renderCrop(crop, index) {
+  if (typeof crop === "string" || typeof crop === "number") {
+    return (
+      <div key={`${crop}-${index}`} className="rounded-xl bg-mist p-4">
+        <span className="font-semibold text-forest-800">{String(crop)}</span>
+      </div>
+    );
+  }
+
+  if (crop && typeof crop === "object") {
+    return (
+      <div
+        key={`${crop.crop || "crop"}-${index}`}
+        className="rounded-xl bg-mist p-4"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-semibold text-forest-800">
+            {safeText(crop.crop) || "Recommended crop"}
+          </span>
+
+          {crop.suitability ? (
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone-600">
+              {safeText(crop.suitability)}
+            </span>
+          ) : null}
+        </div>
+
+        {crop.reason ? (
+          <p className="mt-2 text-sm leading-relaxed text-stone-600">
+            {safeText(crop.reason)}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export default function Weather() {
-  const [records, setRecords] = useState([]);
+  const [weather, setWeather] = useState(null);
+  const [city, setCity] = useState("Nagpur");
+  const [searchCity, setSearchCity] = useState("Nagpur");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  async function loadWeather() {
+  async function loadWeather(cityName = city) {
+    const trimmedCity = cityName.trim();
+
+    if (!trimmedCity) {
+      setError("Please enter a city name.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
-      const data = await getWeather();
+      const data = await getWeatherDashboard(trimmedCity);
 
-      setRecords(sortByLatest(data));
+      console.log("WEATHER DASHBOARD RESPONSE:", data);
+
+      setWeather(data);
+      setCity(trimmedCity);
     } catch (err) {
       console.error("Weather loading error:", err);
-      setError(err.message || "Failed to load weather records.");
+      setError(err.message || "Failed to load weather information.");
     } finally {
       setLoading(false);
     }
   }
 
+  function handleSearch(event) {
+    event.preventDefault();
+    loadWeather(searchCity);
+  }
+
   useEffect(() => {
-    let ignore = false;
-
-    async function fetchWeather() {
-      try {
-        setLoading(true);
-        setError("");
-
-        const data = await getWeather();
-
-        if (!ignore) {
-          setRecords(sortByLatest(data));
-        }
-      } catch (err) {
-        if (!ignore) {
-          console.error("Weather loading error:", err);
-          setError(err.message || "Failed to load weather records.");
-        }
-      } finally {
-        if (!ignore) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchWeather();
-
-    return () => {
-      ignore = true;
-    };
+    loadWeather("Nagpur");
   }, []);
-
-  const current = records[0];
 
   return (
     <div className="space-y-6">
@@ -92,13 +145,52 @@ export default function Weather() {
 
         <button
           type="button"
-          onClick={loadWeather}
+          onClick={() => loadWeather(city)}
           disabled={loading}
           className="w-fit rounded-xl border border-stone-200 bg-white px-4 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {loading ? "Refreshing..." : "Refresh"}
         </button>
       </div>
+
+      {/* City Search */}
+      <Card>
+        <form
+          onSubmit={handleSearch}
+          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+        >
+          <div className="flex-1">
+            <label
+              htmlFor="weather-city"
+              className="mb-2 block text-sm font-medium text-stone-700"
+            >
+              Enter city
+            </label>
+
+            <div className="relative">
+              <MapPin className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400" />
+
+              <input
+                id="weather-city"
+                type="text"
+                value={searchCity}
+                onChange={(event) => setSearchCity(event.target.value)}
+                placeholder="Enter city name, e.g. Umred"
+                className="w-full rounded-xl border border-stone-300 bg-white py-3 pl-10 pr-4 text-sm outline-none transition focus:border-forest-600 focus:ring-1 focus:ring-forest-600"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || !searchCity.trim()}
+            className="flex items-center justify-center gap-2 rounded-xl bg-forest-800 px-5 py-3 text-sm font-medium text-white transition hover:bg-forest-900 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Search className="h-4 w-4" />
+            {loading ? "Searching..." : "Search"}
+          </button>
+        </form>
+      </Card>
 
       {loading ? (
         <Card className="flex min-h-64 items-center justify-center text-center">
@@ -127,14 +219,14 @@ export default function Weather() {
 
             <button
               type="button"
-              onClick={loadWeather}
+              onClick={() => loadWeather(searchCity)}
               className="mt-4 rounded-xl bg-forest-800 px-4 py-2 text-sm font-medium text-white transition hover:bg-forest-900"
             >
               Try Again
             </button>
           </div>
         </Card>
-      ) : records.length === 0 ? (
+      ) : !weather ? (
         <Card className="flex min-h-64 items-center justify-center text-center">
           <div>
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-mist text-forest-800">
@@ -142,38 +234,40 @@ export default function Weather() {
             </div>
 
             <h3 className="mt-4 font-semibold text-stone-900">
-              No weather records yet
+              No weather information available
             </h3>
 
             <p className="mt-2 max-w-md text-sm text-stone-500">
-              There are currently no weather records available from the backend.
+              There is currently no weather information available from the
+              backend.
             </p>
           </div>
         </Card>
       ) : (
         <>
+          {/* Main weather */}
           <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
             <Card className="bg-gradient-to-br from-forest-900 to-forest-800 text-white">
               <p className="flex items-center gap-2 text-sm text-emerald-100">
                 <MapPin className="h-4 w-4" />
-                {current.location || "Location unavailable"}
+                {safeText(weather.location) || city}
               </p>
 
               <p className="mt-6 text-6xl font-extrabold tracking-tight">
-                {current.temperature ?? "N/A"}°
+                {safeText(weather.weather?.temperature) || "N/A"}°
               </p>
 
               <p className="mt-1 text-lg text-emerald-100">
-                {current.weather_condition || "Condition unavailable"}
+                {safeText(weather.weather?.condition) ||
+                  "Condition unavailable"}
               </p>
 
               <p className="mt-2 text-sm text-emerald-200/80">
-                {current.district || ""}
-                {current.district && current.state ? ", " : ""}
-                {current.state || ""}
+                {safeText(weather.location) || city}
               </p>
             </Card>
 
+            {/* Weather metrics */}
             <div className="grid grid-cols-2 gap-4">
               <Card>
                 <Droplets className="mb-3 h-5 w-5 text-forest-700" />
@@ -181,7 +275,9 @@ export default function Weather() {
                 <p className="text-xs text-stone-500">Humidity</p>
 
                 <p className="text-xl font-bold">
-                  {current.humidity != null ? `${current.humidity}%` : "N/A"}
+                  {weather.weather?.humidity != null
+                    ? `${safeText(weather.weather.humidity)}%`
+                    : "N/A"}
                 </p>
               </Card>
 
@@ -191,7 +287,9 @@ export default function Weather() {
                 <p className="text-xs text-stone-500">Rainfall</p>
 
                 <p className="text-xl font-bold">
-                  {current.rainfall != null ? `${current.rainfall} mm` : "N/A"}
+                  {weather.weather?.rainfall != null
+                    ? `${safeText(weather.weather.rainfall)} mm`
+                    : "N/A"}
                 </p>
               </Card>
 
@@ -201,8 +299,8 @@ export default function Weather() {
                 <p className="text-xs text-stone-500">Wind speed</p>
 
                 <p className="text-xl font-bold">
-                  {current.wind_speed != null
-                    ? `${current.wind_speed} km/h`
+                  {weather.weather?.wind_speed != null
+                    ? `${safeText(weather.weather.wind_speed)} km/h`
                     : "N/A"}
                 </p>
               </Card>
@@ -213,13 +311,14 @@ export default function Weather() {
                 <p className="text-xs text-stone-500">Pressure</p>
 
                 <p className="text-xl font-bold">
-                  {current.pressure != null ? current.pressure : "N/A"}
+                  {safeText(weather.weather?.pressure) || "N/A"}
                 </p>
               </Card>
             </div>
           </div>
 
-          {current.prediction ? (
+          {/* Weather prediction */}
+          {weather.ml_prediction ? (
             <Card>
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-mist text-forest-800">
@@ -232,83 +331,62 @@ export default function Weather() {
                   </h3>
 
                   <p className="mt-1 text-sm leading-relaxed text-stone-600">
-                    {current.prediction}
+                    {safeText(weather.ml_prediction)}
                   </p>
                 </div>
               </div>
             </Card>
           ) : null}
 
-          {records.length > 1 ? (
-            <div>
-              <h3 className="mb-4 text-lg font-semibold text-stone-900">
-                Weather Records
+          {/* Recommended crops */}
+          {Array.isArray(weather.recommended_crops) &&
+          weather.recommended_crops.length > 0 ? (
+            <Card>
+              <h3 className="font-semibold text-stone-900">
+                Recommended Crops
               </h3>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {records.slice(1).map((record) => (
-                  <Card key={record.id}>
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-semibold text-stone-900">
-                          {record.location || "Unknown location"}
-                        </p>
-
-                        <p className="mt-1 text-xs text-stone-400">
-                          {record.district || ""}
-                          {record.district && record.state ? ", " : ""}
-                          {record.state || ""}
-                        </p>
-                      </div>
-
-                      <CloudRain className="h-5 w-5 text-forest-700" />
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <p className="text-stone-500">Temperature</p>
-                        <p className="font-semibold">
-                          {record.temperature ?? "N/A"}°
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-stone-500">Humidity</p>
-                        <p className="font-semibold">
-                          {record.humidity != null
-                            ? `${record.humidity}%`
-                            : "N/A"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-stone-500">Rainfall</p>
-                        <p className="font-semibold">
-                          {record.rainfall != null
-                            ? `${record.rainfall} mm`
-                            : "N/A"}
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="text-stone-500">Wind</p>
-                        <p className="font-semibold">
-                          {record.wind_speed != null
-                            ? `${record.wind_speed} km/h`
-                            : "N/A"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {record.weather_condition ? (
-                      <p className="mt-4 text-sm text-stone-600">
-                        {record.weather_condition}
-                      </p>
-                    ) : null}
-                  </Card>
-                ))}
+              <div className="mt-4 space-y-3">
+                {weather.recommended_crops.map((crop, index) =>
+                  renderCrop(crop, index),
+                )}
               </div>
-            </div>
+            </Card>
+          ) : null}
+
+          {/* Alerts */}
+          {weather.alerts ? (
+            <Card>
+              <h3 className="font-semibold text-stone-900">Weather Alerts</h3>
+
+              <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                {safeText(weather.alerts)}
+              </p>
+            </Card>
+          ) : null}
+
+          {/* Irrigation */}
+          {weather.irrigation ? (
+            <Card>
+              <h3 className="font-semibold text-stone-900">
+                Irrigation Advice
+              </h3>
+
+              <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                {safeText(weather.irrigation)}
+              </p>
+            </Card>
+          ) : null}
+
+          {/* Farmer advice */}
+          {weather.farmer_advice ? (
+            <Card>
+              <h3 className="font-semibold text-stone-900">Farmer Advice</h3>
+
+              <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                {safeText(weather.farmer_advice)}
+              </p>
+            </Card>
           ) : null}
         </>
       )}
